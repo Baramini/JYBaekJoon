@@ -1,9 +1,18 @@
 #include <iostream>
-#include <string.h>
 using namespace std;
 
-void check(int** arr, int x, int y) {
-    
+void check(int** arr, int r, int c, int n, int m) {
+    if ((c - 1 >= 0) && arr[r][c - 1] != 0) {
+        arr[r][c] = 0;
+        check(arr, r, (c - 1), n, m);
+    }
+    if ((r - 1 >= 0) && arr[r - 1][c] != 0) {
+        arr[r][c] = 0;
+        check(arr, (r - 1), c, n, m);
+    }
+    if ((c + 1 < m) && arr[r][c + 1] != 0) check(arr, r, (c + 1), n, m);
+    if ((r + 1 < n) && arr[r + 1][c] != 0) check(arr, (r + 1), c, n, m);    
+    arr[r][c] = 0;
 }
 
 int main() {
@@ -12,23 +21,24 @@ int main() {
     for (int i = 0; i < T; i++) {
         int M, N, K, cnt = 0;
         cin >> M >> N >> K;
-        int** arr = new int*[M];
-        for (int j = 0; j < M; j++) {
-            arr[j] = new int[N];
-            memset(arr[j], 0, sizeof(int) * N);
-        }
+        int** arr = new int*[N];
+        for (int j = 0; j < N; j++) arr[j] = new int[M]();
         for (int j = 0; j < K; j++) {
-            int x, y;
-            cin >> x >> y;
-            arr[x][y]++;
+            int r, c;
+            cin >> c >> r;
+            arr[r][c]++;
         }
+
         for (int j = 0; j < N; j++) {
             for (int k = 0; k < M; k++) {
-                if (arr[k][j] != 0) check(arr, k, j);
-                cnt++;
+                if (arr[j][k] != 0) {
+                    check(arr, j, k, N, M);
+                    cnt++;
+                }
             }
         }
-        for (int j = 0; j < M; j++) {
+        cout << cnt << '\n';
+        for (int j = 0; j < N; j++) {
             delete[] arr[j];
         }
         delete[] arr;
