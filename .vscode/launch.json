@@ -1,17 +1,18 @@
 {
+    "version": "2.0.0",
     "configurations": [
         {
             "name": "C/C++: g++.exe 활성 파일 빌드 및 디버그",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}\\build\\${fileBasenameNoExtension}.exe",
+            "program": "${fileDirname}/build/${fileBasenameNoExtension}.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "C:\\mingw64\\bin",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "C:\\mingw64\\bin\\gdb.exe",
+            "miDebuggerPath": "C:/mingw64/bin/gdb.exe",
             "setupCommands": [
                 {
                     "description": "gdb에 자동 서식 지정 사용",
@@ -24,8 +25,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "C/C++: g++.exe 활성 파일 빌드"
+            "preLaunchTask": "C++ Build"
         }
-    ],
-    "version": "2.0.0"
+    ]
 }

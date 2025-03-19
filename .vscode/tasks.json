@@ -1,25 +1,71 @@
 {
+    "version": "2.0.0",
+    "runner": "terminal",
+    "type": "shell",
+    "echoCommand": true,
+    "presentation": {
+        "reveal": "always"
+    },
     "tasks": [
         {
-            "type": "cppbuild",
-            "label": "C/C++: g++.exe 활성 파일 빌드",
-            "command": "C:\\mingw64\\bin\\g++.exe",
+            "label": "C++ Build",
+            "command": "g++",
             "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "${file}",
                 "-o",
-                "${fileDirname}\\build\\${fileBasenameNoExtension}.exe"
+                "${fileDirname}/build/${fileBasenameNoExtension}.exe",
+                "${file}"
             ],
-            "options": {
-                "cwd": "C:\\mingw64\\bin"
+            "group": {
+                "kind": "build",
+                "isDefault": true
             },
-            "problemMatcher": [
-                "$gcc"
+            "problemMatcher": {
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "C Build",
+            "command": "gcc",
+            "args": [
+                "-o",
+                "${fileDirname}/build/${fileBasenameNoExtension}.exe",
+                "${file}"
             ],
             "group": "build",
-            "detail": "디버거에서 생성된 작업입니다."
+            "problemMatcher": {
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Execute",
+            "command": "cmd",
+            "group": "test",
+            "args": [
+                "/C",
+                "${fileDirname}/build/${fileBasenameNoExtension}.exe"
+            ]
         }
-    ],
-    "version": "2.0.0"
+    ]
 }
