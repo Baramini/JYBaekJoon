@@ -15,6 +15,11 @@
         "xmemory": "cpp",
         "xstring": "cpp",
         "xutility": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "list": "cpp",
+        "initializer_list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "xtree": "cpp"
     }
 }
