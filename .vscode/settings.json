@@ -20,6 +20,7 @@
         "initializer_list": "cpp",
         "map": "cpp",
         "set": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "cstdlib": "cpp"
     }
 }
