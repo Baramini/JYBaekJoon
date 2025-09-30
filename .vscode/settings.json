@@ -21,6 +21,7 @@
         "map": "cpp",
         "set": "cpp",
         "xtree": "cpp",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "unordered_map": "cpp"
     }
 }
