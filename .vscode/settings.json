@@ -22,6 +22,7 @@
         "set": "cpp",
         "xtree": "cpp",
         "cstdlib": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "queue": "cpp"
     }
 }
