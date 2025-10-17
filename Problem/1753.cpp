@@ -1,45 +1,51 @@
-// #include <iostream>
-// #include <vector>
-// #include <queue>
+#include <iostream>
+#include <vector>
+#include <queue>
 
-// using namespace std;
+using namespace std;
 
-// struct Edge {
-//     int dest;
-//     int weight;
+const int INF = 2100000000;
 
-//     Edge(int d, int w) : dest(d), weight(w) {}
-// };
-// struct Vertex {
-//     int data;
-//     vector<Edge*> edges;
+void dijkstra(vector<vector<pair<int, int>>>& edges, vector<int>& dist, int start_vertex) {
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> vertices;
+    vertices.push(pair(0, start_vertex));
 
-//     Vertex(int val) : data(val) {}
-// };
-// priority_queue<Vertex*> graph;
+    while (!vertices.empty()) {
+        auto[d, cur] = vertices.top();
+        vertices.pop();
 
-// void dijkstra(int start) {
-//     priority_queue<Edge*, vector<Edge*>, greater<>> pq;
+        if (d > dist[cur]) continue;
 
-// }
+        for (const auto& [next, weight] : edges[cur]) {
+            if (dist[next] > dist[cur] + weight) {
+                dist[next] = dist[cur] + weight;
+                vertices.push(pair(dist[next], next));
+            }
+        }
+    }
+}
 
-// int main() {
-//     int V, E, K;
-//     cin >> V >> E >> K;
-//     for (int i = 0; i <= V; i++) {
-//         Vertex* v = new Vertex(i);
-//         graph.push_back(v);
-//     }
+int main() {
+    int V, E, K;
+    cin >> V >> E >> K;
 
-//     for (int i = 0; i < E; i++) {
-//         int u, v, w;
-//         cin >> u >> v >> w;
-//         Edge* e = new Edge(v, w);
-//         graph[u]->edges.push_back(e);
+    vector<int> dist;
+    dist.assign(V, INF);
+    dist[K-1] = 0;
 
-//     }
+    vector<vector<pair<int, int>>> edges(V);
+    for (int i = 0; i < E; i++) {
+        int u, v, w;
+        cin >> u >> v >> w;
+        edges[u-1].push_back(make_pair(v-1, w));
+    }
 
-//     dijkstra(K);
+    dijkstra(edges, dist, K-1);
 
-//     return 0;
-// }
+    for (const auto& d : dist) {
+        if (d == INF) printf("INF\n");
+        else printf("%d\n", d);
+    }
+
+    return 0;
+}
