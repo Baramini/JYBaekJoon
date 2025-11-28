@@ -25,6 +25,8 @@
         "unordered_map": "cpp",
         "queue": "cpp",
         "xhash": "cpp",
-        "xlocinfo": "cpp"
+        "xlocinfo": "cpp",
+        "xiosbase": "cpp",
+        "fstream": "cpp"
     }
 }

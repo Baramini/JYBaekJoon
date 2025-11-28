@@ -1,28 +1,150 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <cmath>
+#include <chrono>
 
 using namespace std;
 
 /*
-제가 선택한 방식은 클러스터링 기반의 휴리스틱 알고리즘입니다.
-NP-Hard 문제이므로 다항식 시간안에 최적해를 구하는 것은 불가능하기 때문에
-다항식 시간안에 해결이 되면서도 어느 정도의 근사비율을 보장하는 방식을 골랐습니다.
+NN(Nearest Neighbor) + 2-opt
 
-이 알고리즘에서는 총 3가지의 단계로 문제를 해결합니다.
-1. 클러스터링을 통해 부분집합으로 나눕니다.
-2. 각각의 부분집합에서 최적해를 구합니다.
-3. 각 부분집합을 합치면서 최종 TSP의 근사해를 도출합니다.
+<입력>
+1 x1 y1
+2 x2 y2
+...
+n xn yn
+EOF
 
-구체적인 과정은 다음과 같습니다.
-1번의 과정에서 K-means 알고리즘을 사용하여 여러 부분집합으로 클러스터링합니다.
-2번의 과정에서 DP를 활용한 Bellman-Held-Karp 알고리즘을 사용하며 각 부분집합에서의 TSP의 최적해를 찾습니다.
-3번의 과정에서 이웃하는 두 클러스터를 연결할 때 가장 짧은 경로를 찾아서 연결하도록 합니다.
-
-해당 알고리즘의 가장 큰 장점은 3가지라고 생각했습니다.
-1. 부분 집합의 최적해를 보장하기 때문에 어느 정도의 근사비율을 보장할 것이라 생각했습니다.
-2. 노드의 개수가 많으면 많을수록 다른 알고리즘에 비해 시간을 많이 단축할 수 있을 것이라 생각했습니다.
-3. 각 부분집합에서 최적해를 찾는 과정이 독립적이기 때문에 병렬적으로 처리할 수 있어서 시간을 단축할 수 있을 것이라 생각했습니다.
+<출력>
+NN으로 구한 경로 합
+2-opt로 구한 경로 합
+소요 시간
 */
 
+const double INF { 1e9 };
+
+struct Point {
+    int id;
+    double x, y;
+};
+
+// 유클리드 거리 계산
+double get_distance(const Point& a, const Point& b) {
+    double dx = a.x - b.x;
+    double dy = a.y - b.y;
+    return sqrt(dx*dx + dy*dy);
+}
+
+// 경로상의 거리 합 계산
+double get_sum_path(const vector<int>& path, const vector<vector<double>>& dist) {
+    double sum = 0.0;
+    int n = path.size();
+    for (int i = 0; i < n; i++) {
+        sum += dist[path[i]][path[(i + 1) % n]];
+    }
+    return sum;
+}
+
+// NN 방식 적용
+void do_NN(vector<int>& path, const vector<vector<double>>& dist) {
+    int n = dist.size();
+    int current = 0;
+    
+    path.push_back(current);
+
+    vector<bool> visited(n, false);
+    visited[current] = true;
+
+    for (int i = 1; i < n; i++) {
+        double min_dist = INF;
+        int next = -1;
+        for (int j = 0; j < n; j++) {
+            if (!visited[j] && dist[current][j] < min_dist) {
+                min_dist = dist[current][j];
+                next = j;
+            }
+        }
+        current = next;
+        path.push_back(current);
+        visited[current] = true;
+    }
+}
+
+// 2-opt 방식 적용
+void do_two_opt(vector<int>& path, const vector<vector<double>>& dist) {
+    int n = path.size();
+    bool can_improve = true;
+
+    while (can_improve) {
+        can_improve = false;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = i + 1; j < n; j++) {
+                int a = path[i];
+                int b = path[(i + 1) % n];
+                int c = path[j];
+                int d = path[(j + 1) % n];
+
+                double dist_difference = (dist[a][c] + dist[b][d]) - (dist[a][b] + dist[c][d]);
+                if (dist_difference < 0.0) {
+                    int start = i + 1;
+                    int end = j;
+                    while (start < end) {
+                        swap(path[start], path[end]);
+                        start++;
+                        end--;
+                    }
+                    can_improve = true;
+                }
+            }
+        }
+    }
+}
+
 int main() {
+    // 파일 입력
+    ifstream infile("berlin52_TSP.txt");
+    if (!infile) {
+        cerr << "파일 열기 실패\n";
+        return 1;
+    }
+
+    vector<Point> points;
+    int id;
+    double x, y;
+    while (infile >> id >> x >> y) {
+        points.push_back({id - 1, x, y});
+    }
+    infile.close();
+
+    // Distance Matrix 구성
+    int n = points.size();
+    vector<vector<double>> dist(n, vector<double>(n, 0.0));
+    
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            dist[i][j] = get_distance(points[i], points[j]);
+        }
+    }
+
+    auto start = chrono::high_resolution_clock::now();
+
+    // NN 실행
+    vector<int> path(n);
+    do_NN(path, dist);
+    double NN_sum_path = get_sum_path(path, dist);
+
+    // 2-opt 실행
+    do_two_opt(path, dist);
+    double two_opt_sum_path = get_sum_path(path, dist);
+
+    auto end = chrono::high_resolution_clock::now();
+
+    cout << "NN 경로 합: " << NN_sum_path << "\n";
+    cout << "2-opt 후 경로 합: " << two_opt_sum_path << "\n";
+
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+    cout << "소요 시간: " << duration.count() << " ms" << endl;
+
     return 0;
 }
